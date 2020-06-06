@@ -33,7 +33,7 @@ F = [1];
 Q = 100; 
 R = 0.01;
 alpha = 0.1;
-gamma = 0.2;
+gamma = 10;
 
 % The augmented system
 Q1 = [C'*Q*C -C'*Q; -Q*C Q];
