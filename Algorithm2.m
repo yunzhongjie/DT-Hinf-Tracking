@@ -1,7 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % H_inf tracking control for linear discrete-time systems          %%
 % Model-free Q-learning algorithm                                  %%
-% By Yunjie Yang. 2020.                                            %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 close all;
@@ -32,7 +31,7 @@ F = [1];
 Q = 100; 
 R = 0.01;
 alpha = 0.1;
-gamma = 0.2;
+gamma = 10;
 
 % The augmented system
 Q1 = [C'*Q*C -C'*Q; -Q*C Q];
@@ -49,6 +48,9 @@ tempB = sqrt(exp(-alpha))*[B1, E1];
 tempQ = Q1;
 tempR = [R 0; 0 -gamma^2];
 P_dare = dare(tempA, tempB, tempQ, tempR);
+
+X0 = [0;0;0;2];
+V0 = X0'*P_dare*X0
 
 % Calculate the optimal control policy and worst case disturbance using P
 L_P_dare = inv(R + exp(-alpha)*B1'*P_dare*B1 - exp(-alpha)^2*(B1'*P_dare*E1) * inv(exp(-alpha)*E1'*P_dare*E1 - gamma^2) * (E1'*P_dare*B1))...
@@ -117,11 +119,11 @@ for n = 1:Count_N
     uu = L * X(:,n);
     ww = K * X(:,n);
     %case 1
-    u = uu + a1 * (sin(2*n) + sin(5*n) + sin(9*n) + sin(11*n));
-    w = ww + a2 * (cos(3*n) + cos(6*n) + cos(8*n) + cos(12*n));
+%     u = uu + a1 * (sin(2*n) + sin(5*n) + sin(9*n) + sin(11*n));
+%     w = ww + a2 * (cos(3*n) + cos(6*n) + cos(8*n) + cos(12*n));
     %case 2
-%     u = uu + a1 * 10 * (rand-0.5);
-%     w = ww + a2 * 10 * (rand-0.5);
+    u = uu + a1 * 10 * (rand-0.5);
+    w = ww + a2 * 10 * (rand-0.5);
 
     x(:, n+1) = A*x(:,n) + B*u + E*w;
     y(n) = C * x(:,n);
@@ -234,6 +236,9 @@ end
 L_mf = L
 K_mf = K
 
+err_L_norm_c2 = err_L_norm;
+err_K_norm_c2 = err_K_norm;
+
 figure(1)
 subplot(2,1,1), hold on, box on;
 plot(1:mm, err_L_norm,'m','linewidth',3);
@@ -246,6 +251,10 @@ plot(1:mm, err_K_norm,'bo','linewidth',3);
 ylabel('||K-K^*||');
 set(gca,'FontSize',30, 'FontName','Times New Roman');
 hold off
+
+
+y_c2 = y;
+r_c2 = r;
 
 figure(2),hold on, box on
 t=1:Count_N;
